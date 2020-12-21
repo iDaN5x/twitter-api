@@ -1,8 +1,8 @@
 import { registerAs } from "@nestjs/config";
 import { plainToClass } from "class-transformer";
-import { ClientOpts as IRedisConfig } from "redis";
+import { ClientOpts } from "redis";
 
-export class RedisConfig implements IRedisConfig {
+export class RedisOptions implements ClientOpts {
     host?: string;
     port?: number;
     path?: string;
@@ -19,7 +19,7 @@ export class RedisConfig implements IRedisConfig {
 
 export const redisConfig = registerAs("redis", () => {
     return plainToClass(
-        RedisConfig,
+        RedisOptions,
         {
             host: process.env["REDIS_HOST"],
             port: process.env["REDIS_PORT"],

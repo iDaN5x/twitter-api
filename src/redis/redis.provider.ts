@@ -1,12 +1,13 @@
 import { FactoryProvider } from "@nestjs/common";
 import { once } from "events";
 import { RedisClient, createClient } from "redis";
-import { RedisConfig, redisConfig } from "./redis.config";
+import { REDIS_CLIENT_OPTIONS } from "./constants";
+import { RedisOptions } from "./redis.config";
 
 export const redisFactory: FactoryProvider = {
     provide: RedisClient,
-    inject: [redisConfig.KEY],
-    async useFactory(config: RedisConfig) {
+    inject: [REDIS_CLIENT_OPTIONS],
+    async useFactory(config: RedisOptions) {
         const client = createClient(config);
         await once(client, "ready");
         return client;
