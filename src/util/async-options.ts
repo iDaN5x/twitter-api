@@ -16,17 +16,13 @@ export interface AsyncOptions<TOptions>
 export function createAsyncOptionsProvider<TOptions>(
     options: AsyncOptions<TOptions>
 ): Provider {
-    if (options.useExisting) {
+    if (options.useClass || options.useExisting) {
         return {
             provide: options.key,
-            useExisting: options.useExisting
-        };
-    }
-
-    if (options.useClass) {
-        return {
-            provide: options.key,
-            useClass: options.useClass
+            inject: [options.useClass || options.useExisting],
+            async useFactory(optionsFactory: OptionsFactory<TOptions>) {
+                return optionsFactory.createOptions();
+            }
         };
     }
 
