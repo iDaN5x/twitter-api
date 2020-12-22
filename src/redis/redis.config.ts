@@ -1,8 +1,10 @@
 import { registerAs } from "@nestjs/config";
 import { plainToClass } from "class-transformer";
-import { ClientOpts } from "redis";
+import { ClientOpts as IRedisOptions } from "redis";
 
-export class RedisOptions implements ClientOpts {
+export { ClientOpts as IRedisOptions } from "redis";
+
+export class RedisOptions implements IRedisOptions {
     host?: string;
     port?: number;
     path?: string;

@@ -1,16 +1,16 @@
 import { DynamicModule, Module } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
+import { ConfigModule, ConfigType } from "@nestjs/config";
 import {
     AsyncOptions,
     createAsyncOptionsProvider
 } from "src/util/async-options";
 import { REDIS_CLIENT_OPTIONS } from "./constants";
-import { RedisOptions, redisConfig } from "./redis.config";
+import { IRedisOptions, redisConfig } from "./redis.config";
 import { redisFactory } from "./redis.provider";
 
 @Module({})
 export class RedisModule {
-    static register(options: RedisOptions): DynamicModule {
+    static register(options: IRedisOptions): DynamicModule {
         return {
             module: RedisModule,
             providers: [
@@ -24,7 +24,7 @@ export class RedisModule {
         };
     }
 
-    static registerAsync(options: AsyncOptions<RedisOptions>): DynamicModule {
+    static registerAsync(options: AsyncOptions<IRedisOptions>): DynamicModule {
         const optionsProvider = createAsyncOptionsProvider(options);
 
         return {
@@ -34,11 +34,20 @@ export class RedisModule {
         };
     }
 
-    static registerWithConfig(): DynamicModule {
+    static registerWithConfig(overrides: IRedisOptions = {}): DynamicModule {
         return {
             module: RedisModule,
             imports: [ConfigModule.forFeature(redisConfig)],
-            providers: [redisFactory],
+            providers: [
+                redisFactory,
+                {
+                    inject: [redisConfig.KEY],
+                    provide: REDIS_CLIENT_OPTIONS,
+                    useFactory(config: ConfigType<typeof redisConfig>) {
+                        return { ...config, ...overrides };
+                    }
+                }
+            ],
             exports: [redisFactory]
         };
     }
