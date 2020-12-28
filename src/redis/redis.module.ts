@@ -5,12 +5,13 @@ import {
     createAsyncOptionsProvider
 } from "src/util/async-options";
 import { REDIS_CLIENT_OPTIONS } from "./constants";
-import { IRedisOptions, redisConfig } from "./redis.config";
+import { RedisOptions } from "./redis-options.interface";
+import { redisConfig } from "./redis.config";
 import { redisFactory } from "./redis.provider";
 
 @Module({})
 export class RedisModule {
-    static register(options: IRedisOptions): DynamicModule {
+    static register(options: RedisOptions): DynamicModule {
         return {
             module: RedisModule,
             providers: [
@@ -24,17 +25,18 @@ export class RedisModule {
         };
     }
 
-    static registerAsync(options: AsyncOptions<IRedisOptions>): DynamicModule {
+    static registerAsync(options: AsyncOptions<RedisOptions>): DynamicModule {
         const optionsProvider = createAsyncOptionsProvider(options);
 
         return {
             module: RedisModule,
+            imports: options.imports,
             providers: [redisFactory, optionsProvider],
             exports: [redisFactory]
         };
     }
 
-    static registerWithConfig(overrides: IRedisOptions = {}): DynamicModule {
+    static registerWithConfig(overrides: RedisOptions = {}): DynamicModule {
         return {
             module: RedisModule,
             imports: [ConfigModule.forFeature(redisConfig)],
@@ -43,7 +45,7 @@ export class RedisModule {
                 {
                     inject: [redisConfig.KEY],
                     provide: REDIS_CLIENT_OPTIONS,
-                    useFactory(config: ConfigType<typeof redisConfig>) {
+                    useFactory(config: RedisOptions) {
                         return { ...config, ...overrides };
                     }
                 }

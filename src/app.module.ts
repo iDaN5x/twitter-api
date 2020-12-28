@@ -1,12 +1,15 @@
 import { Module } from "@nestjs/common";
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
+import { ConfigModule } from "@nestjs/config";
 import { RedisModule } from "./redis/redis.module";
 import { SessionModule } from "./session/session.module";
 
 @Module({
-    imports: [RedisModule, SessionModule],
-    controllers: [AppController],
-    providers: [AppService]
+    imports: [
+        ConfigModule.forRoot(),
+        RedisModule.registerWithConfig(),
+        SessionModule.registerWithConfig()
+    ],
+    controllers: [],
+    providers: []
 })
 export class AppModule {}
